@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My Test Webpage</title>
+</head>
+<body>
+
+{%- for r in invenio_records %}
+{%- set creation_date = r.created|from_isodatetime -%}
+{%- set record_url = url_for('invenio_app_rdm_records.record_detail', pid_value=r.id) %}
+
+<article>
+<!--TODO:
+something with doi
+-->
+<div class="badges">
+    <!--Publication date/Version badge-->
+    <span class="ui label record-version" title="{{_('Publication date')}}">
+    {{ r.metadata.publication_date }} {{ '(' ~ r.metadata.version ~ ')' if r.metadata.version }}
+    </span>
+
+    <!--Resource type badge-->
+    <span class="ui label teal" title="{{_('Resource type')}}">
+    {{r.metadata.resource_type | cast_to_dict | vocabulary_title('resource_type') }}
+    </span>
+
+    <span class="label record-version">
+    <!--TODO: add subtype--->
+    </span>
+</div>
+
+<h4>
+    <a href="{{ record_url }}" class="no-decoration">
+    {{r.metadata.title}}
+    </a>
+</h4>
+
+<p class="hidden-xs">
+    <a href="{{record_url}}" class="no-decoration">
+    {{ r.metadata.description | striptags | truncate(300) }}
+    </a>
+</p>
+
+<div class="ui grid">
+    <div class="two column row">
+    <div class="left floated column">
+        {%- for s in r.metadata.subjects %}
+        <div class="ui tiny label">{{s.subject}}</div>
+        {%- endfor %}
+        <div>
+        <small>
+            {% trans user=userprofile, date=creation_date | dateformat('long')%}
+            Uploaded on {{date}}
+            {% endtrans %}
+        </small>
+        </div>
+    </div>
+
+    </div>
+</div>
+</article>
+{% endfor %}
+
+</body>
+</html>
